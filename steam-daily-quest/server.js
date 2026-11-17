@@ -62,16 +62,19 @@ app.get('/api/daily-quest', async (req, res) => {
   const steamId = req.query.steamid;
   if (!steamId) {
     return res.status(401).json({ error: 'Not logged in' });
-  }
-
-  const rerollOffset = parseInt(req.query.reroll || '0', 10);
-
   try {
-    const gamesUrl = `https://steampowered.com{STEAM_API_KEY}&steamid=${steamId}&include_appinfo=1&include_played_free_games=1&format=json`;
+    const gamesUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}&include_appinfo=1&include_played_free_games=1&format=json`;
     const gamesRes = await fetch(gamesUrl);
-    const gamesData = await gamesRes.json();
 
+    if (!gamesRes.ok) {
+      return res.status(502).json({
+        error: `Steam rejected the API request (Status ${gamesRes.status}). Check that STEAM_API_KEY in Render has no extra spaces.`
+      });
+    }
+
+    const gamesData = await gamesRes.json();
     const games = gamesData.response && gamesData.response.games;
+
     if (!games || games.length === 0) {
       return res.status(400).json({
         error: 'No games found. Make sure your Steam Profile "Game details" are set to Public!'
@@ -89,29 +92,36 @@ app.get('/api/daily-quest', async (req, res) => {
       icon: null
     };
 
-    const achUrl = `https://steampowered.com{chosenGame.appid}&key=${STEAM_API_KEY}&steamid=${steamId}`;
-    const schemaUrl = `https://steampowered.com{STEAM_API_KEY}&appid=${chosenGame.appid}`;
+    // Safely check achievements (some games have none and return 400)
+    try {
+      const achUrl = `https://steampowered.com{chosenGame.appid}&key=${encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}`;
+      const schemaUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&appid=${chosenGame.appid}`;
 
-    const [achRes, schemaRes] = await Promise.all([fetch(achUrl), fetch(schemaUrl)]);
-    const achData = await achRes.json();
-    const schemaData = await schemaRes.json();
+      const [achRes, schemaRes] = await Promise.all([fetch(achUrl), fetch(schemaUrl)]);
+      if (achRes.ok && schemaRes.ok) {
+        const achData = await achRes.json();
+        const schemaData = await schemaRes.json();
 
-    const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
-    const schemaAchs = (schemaData.game && schemaData.game.availableGameStats && schemaData.game.availableGameStats.achievements) || [];
-    const lockedAchs = playerAchs.filter(a => a.achieved === 0);
+        const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
+        const schemaAchs = (schemaData.game && schemaData.game.availableGameStats && schemaData.game.availableGameStats.achievements) || [];
+        const lockedAchs = playerAchs.filter(a => a.achieved === 0);
 
-    if (lockedAchs.length > 0 && schemaAchs.length > 0) {
-      const targetAch = lockedAchs.at(seed % lockedAchs.length);
-      const details = schemaAchs.find(s => s.name === targetAch.apiname);
+        if (lockedAchs.length > 0 && schemaAchs.length > 0) {
+          const targetAch = lockedAchs.at(seed % lockedAchs.length);
+          const details = schemaAchs.find(s => s.name === targetAch.apiname);
 
-      if (details) {
-        challenge = {
-          type: 'Steam Achievement',
-          title: details.displayName,
-          description: details.description || 'Hidden Steam Achievement — unlock it in-game to reveal its secret!',
-          icon: details.icon
-        };
+          if (details) {
+            challenge = {
+              type: 'Steam Achievement',
+              title: details.displayName,
+              description: details.description || 'Hidden Steam Achievement — unlock it in-game to reveal its secret!',
+              icon: details.icon
+            };
+          }
+        }
       }
+    } catch (achErr) {
+      console.log('No achievements for this game, using Custom Quest fallback.');
     }
 
     res.json({
@@ -121,6 +131,14 @@ app.get('/api/daily-quest', async (req, res) => {
         playtimeHours: Math.round((chosenGame.playtime_forever || 0) / 60),
         headerImage
       },
+      challenge,
+      totalGames: games.length
+    });
+  } catch (err) {
+    console.error('Server error:', err);
+    res.status(500).json({ error: `Server error: ${err.message}` });
+  }
+
       challenge,
       totalGames: games.length
     });
