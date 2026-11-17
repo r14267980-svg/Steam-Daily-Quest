@@ -87,8 +87,14 @@ app.get('/api/daily-quest', async function(req, res) {
   const rerollOffset = parseInt(req.query.reroll || '0', 10);
 
   try {
-    const gamesUrl = 'https://steampowered.com' + encodeURIComponent(STEAM_API_KEY) + '&steamid=' + encodeURIComponent(steamId) + '&include_appinfo=1&include_played_free_games=1&format=json';
-    const gamesData = await fetchSteamJson(gamesUrl);
+    const gamesUrl = new URL('https://steampowered.com');
+    gamesUrl.searchParams.set('key', STEAM_API_KEY);
+    gamesUrl.searchParams.set('steamid', steamId);
+    gamesUrl.searchParams.set('include_appinfo', '1');
+    gamesUrl.searchParams.set('include_played_free_games', '1');
+    gamesUrl.searchParams.set('format', 'json');
+
+    const gamesData = await fetchSteamJson(gamesUrl.toString());
     const games = gamesData.response && gamesData.response.games;
 
     if (!games || games.length === 0) {
@@ -109,12 +115,18 @@ app.get('/api/daily-quest', async function(req, res) {
     };
 
     try {
-      const achUrl = 'https://steampowered.com' + chosenGame.appid + '&key=' + encodeURIComponent(STEAM_API_KEY) + '&steamid=' + encodeURIComponent(steamId);
-      const schemaUrl = 'https://steampowered.com' + encodeURIComponent(STEAM_API_KEY) + '&appid=' + chosenGame.appid;
+      const achUrl = new URL('https://steampowered.com');
+      achUrl.searchParams.set('appid', chosenGame.appid);
+      achUrl.searchParams.set('key', STEAM_API_KEY);
+      achUrl.searchParams.set('steamid', steamId);
+
+      const schemaUrl = new URL('https://steampowered.com');
+      schemaUrl.searchParams.set('key', STEAM_API_KEY);
+      schemaUrl.searchParams.set('appid', chosenGame.appid);
 
       const [achData, schemaData] = await Promise.all([
-        fetchSteamJson(achUrl),
-        fetchSteamJson(schemaUrl)
+        fetchSteamJson(achUrl.toString()),
+        fetchSteamJson(schemaUrl.toString())
       ]);
 
       const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
