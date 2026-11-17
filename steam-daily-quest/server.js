@@ -14,14 +14,16 @@ const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'super-secret-steam-quest-key',
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
+  proxy: true,
   cookie: {
-    secure: BASE_URL.startsWith('https'),
+    secure: 'auto',
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
   }
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
