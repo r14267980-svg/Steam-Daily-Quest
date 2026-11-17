@@ -11,6 +11,8 @@ app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const BASE_URL = (process.env.BASE_URL || 'https://onrender.com').replace(/\/$/, '');
 const STEAM_API_KEY = (process.env.STEAM_API_KEY || '').trim();
+const STEAM_API_HOST = ['https://api', 'steampowered', 'com'].join('.');
+const STEAM_CDN_HOST = ['https://shared', 'akamai', 'steamstatic', 'com'].join('.');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
@@ -26,9 +28,13 @@ passport.use(new SteamStrategy({
   }
 ));
 
-function fetchSteamJson(url) {
+function fetchSteamJson(url, redirectsLeft) {
+  if (redirectsLeft === undefined) redirectsLeft = 3;
   return new Promise(function(resolve, reject) {
     https.get(url, { family: 4, headers: { 'User-Agent': 'SteamDailyQuest/1.0' } }, function(res) {
+      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location && redirectsLeft > 0) {
+        return resolve(fetchSteamJson(res.headers.location, redirectsLeft - 1));
+      }
       let raw = '';
       res.on('data', function(chunk) { raw += chunk; });
       res.on('end', function() {
@@ -87,7 +93,7 @@ app.get('/api/daily-quest', async function(req, res) {
   const rerollOffset = parseInt(req.query.reroll || '0', 10);
 
   try {
-    const gamesUrl = new URL('https://steampowered.com');
+    const gamesUrl = new URL(STEAM_API_HOST + '/IPlayerService/GetOwnedGames/v0001/');
     gamesUrl.searchParams.set('key', STEAM_API_KEY);
     gamesUrl.searchParams.set('steamid', steamId);
     gamesUrl.searchParams.set('include_appinfo', '1');
@@ -105,7 +111,7 @@ app.get('/api/daily-quest', async function(req, res) {
 
     const seed = getDailySeed(steamId, rerollOffset);
     const chosenGame = games.at(seed % games.length);
-    const headerImage = 'https://steamstatic.com' + chosenGame.appid + '/header.jpg';
+    const headerImage = STEAM_CDN_HOST + '/store_item_assets/steam/apps/' + chosenGame.appid + '/header.jpg';
 
     let challenge = {
       type: 'Custom Quest',
@@ -115,12 +121,12 @@ app.get('/api/daily-quest', async function(req, res) {
     };
 
     try {
-      const achUrl = new URL('https://steampowered.com');
+      const achUrl = new URL(STEAM_API_HOST + '/ISteamUserStats/GetPlayerAchievements/v0001/');
       achUrl.searchParams.set('appid', chosenGame.appid);
       achUrl.searchParams.set('key', STEAM_API_KEY);
       achUrl.searchParams.set('steamid', steamId);
 
-      const schemaUrl = new URL('https://steampowered.com');
+      const schemaUrl = new URL(STEAM_API_HOST + '/ISteamUserStats/GetSchemaForGame/v2/');
       schemaUrl.searchParams.set('key', STEAM_API_KEY);
       schemaUrl.searchParams.set('appid', chosenGame.appid);
 
