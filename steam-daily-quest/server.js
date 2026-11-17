@@ -8,8 +8,8 @@ const app = express();
 app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 3000;
-const BASE_URL = (process.env.BASE_URL || `https://steam-daily-quest.onrender.com`).replace(/\/$/, '');
-const STEAM_API_KEY = process.env.STEAM_API_KEY;
+const BASE_URL = (process.env.BASE_URL || 'https://onrender.com').replace(/\/$/, '');
+const STEAM_API_KEY = (process.env.STEAM_API_KEY || '').trim();
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
@@ -62,13 +62,17 @@ app.get('/api/daily-quest', async (req, res) => {
   const steamId = req.query.steamid;
   if (!steamId) {
     return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const rerollOffset = parseInt(req.query.reroll || '0', 10);
+
   try {
     const gamesUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}&include_appinfo=1&include_played_free_games=1&format=json`;
     const gamesRes = await fetch(gamesUrl);
 
     if (!gamesRes.ok) {
       return res.status(502).json({
-        error: `Steam rejected the API request (Status ${gamesRes.status}). Check that STEAM_API_KEY in Render has no extra spaces.`
+        error: `Steam rejected the API request (Status ${gamesRes.status}). Check that STEAM_API_KEY in Render is valid.`
       });
     }
 
@@ -92,7 +96,6 @@ app.get('/api/daily-quest', async (req, res) => {
       icon: null
     };
 
-    // Safely check achievements (some games have none and return 400)
     try {
       const achUrl = `https://steampowered.com{chosenGame.appid}&key=${encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}`;
       const schemaUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&appid=${chosenGame.appid}`;
@@ -121,7 +124,7 @@ app.get('/api/daily-quest', async (req, res) => {
         }
       }
     } catch (achErr) {
-      console.log('No achievements for this game, using Custom Quest fallback.');
+      console.log('Using custom quest fallback.');
     }
 
     res.json({
@@ -137,14 +140,6 @@ app.get('/api/daily-quest', async (req, res) => {
   } catch (err) {
     console.error('Server error:', err);
     res.status(500).json({ error: `Server error: ${err.message}` });
-  }
-
-      challenge,
-      totalGames: games.length
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to connect to Steam servers.' });
   }
 });
 
