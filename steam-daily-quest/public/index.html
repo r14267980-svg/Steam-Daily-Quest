@@ -17,9 +17,7 @@
       --text-main: #c7d5e0;
       --text-bright: #ffffff;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: radial-gradient(circle at top, #2a475e 0%, #171a21 70%);
@@ -30,7 +28,6 @@
       align-items: center;
       padding: 20px;
     }
-
     header {
       width: 100%;
       max-width: 720px;
@@ -39,145 +36,36 @@
       align-items: center;
       padding: 15px 0 30px;
     }
-
-    .logo {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--text-bright);
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--text-bright); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
     .logo span { color: var(--steam-blue); }
-
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.35);
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-    }
-
-    .user-pill img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 2px solid var(--steam-blue);
-    }
-
-    .user-pill button {
-      background: none;
-      color: #8f98a0;
-      padding: 0 0 0 8px;
-      font-size: 0.8rem;
-    }
-
+    .user-pill { display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.35); padding: 6px 14px; border-radius: 999px; font-size: 0.9rem; }
+    .user-pill img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--steam-blue); }
+    .user-pill button { background: none; color: #8f98a0; padding: 0 0 0 8px; font-size: 0.8rem; }
     .user-pill button:hover { color: var(--text-bright); }
-
     main { width: 100%; max-width: 720px; }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid rgba(102, 192, 244, 0.2);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    }
-
+    .card { background: var(--bg-card); border: 1px solid rgba(102, 192, 244, 0.2); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
     .hero-login { text-align: center; padding: 60px 30px; }
     .hero-login h1 { color: var(--text-bright); font-size: 2.2rem; margin-bottom: 14px; }
     .hero-login p { max-width: 480px; margin: 0 auto 30px; line-height: 1.6; color: #8f98a0; }
-
-    .btn-steam {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
-      color: white;
-      font-weight: 700;
-      font-size: 1.05rem;
-      padding: 14px 28px;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .btn-steam:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6, 191, 255, 0.35); }
-
+    .btn-steam { display: inline-flex; align-items: center; gap: 12px; background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%); color: white; font-weight: 700; font-size: 1.05rem; padding: 14px 28px; border-radius: 8px; text-decoration: none; }
     .game-banner { position: relative; width: 100%; height: 240px; background: #0e141b; }
     .game-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .game-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, var(--bg-card) 5%, rgba(27, 40, 56, 0.2) 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 24px;
-    }
-
-    .badge {
-      align-self: flex-start;
-      background: var(--steam-blue);
-      color: #0e141b;
-      font-weight: 800;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 4px;
-      margin-bottom: 8px;
-      letter-spacing: 0.8px;
-    }
-
+    .game-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card) 5%, rgba(27, 40, 56, 0.2) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; }
+    .badge { align-self: flex-start; background: var(--steam-blue); color: #0e141b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; }
     .game-title { font-size: 1.9rem; font-weight: 800; color: var(--text-bright); }
     .game-meta { font-size: 0.9rem; color: #8f98a0; margin-top: 4px; }
     .quest-body { padding: 24px; }
-
-    .challenge-box {
-      background: rgba(0, 0, 0, 0.25);
-      border-left: 4px solid var(--steam-blue);
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
+    .challenge-box { background: rgba(0, 0, 0, 0.25); border-left: 4px solid var(--steam-blue); border-radius: 8px; padding: 20px; display: flex; gap: 16px; align-items: center; margin-bottom: 24px; }
     .challenge-box img { width: 64px; height: 64px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); }
-    .challenge-type { font-size: 0.75rem; text-transform: uppercase; color: var(--steam-blue); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .challenge-type { font-size: 0.75rem; text-transform: uppercase; color: var(--steam-blue); font-weight: 700; margin-bottom: 4px; }
     .challenge-title { font-size: 1.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
     .challenge-desc { font-size: 0.95rem; line-height: 1.5; color: var(--text-main); }
-
     .actions { display: flex; flex-wrap: wrap; gap: 12px; }
-
-    button, .btn-launch {
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      padding: 12px 20px;
-      transition: all 0.15s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
+    button, .btn-launch { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; font-size: 0.95rem; padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-launch { background: var(--steam-green); color: white; flex: 1; }
-    .btn-launch:hover { background: var(--steam-green-hover); }
     .btn-complete { background: var(--bg-accent); color: var(--text-bright); flex: 1; }
     .btn-complete.done { background: #1e3a2f; color: #4ade80; border: 1px solid #4ade80; }
     .btn-reroll { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
-    .btn-reroll:hover { background: rgba(255, 255, 255, 0.15); }
-
     .error-msg { padding: 30px; text-align: center; color: #f87171; line-height: 1.6; }
     .hidden { display: none !important; }
   </style>
@@ -191,21 +79,17 @@
       <button id="logout-btn" type="button">Logout</button>
     </div>
   </header>
-
   <main>
     <div id="login-view" class="card hero-login">
       <h1>Conquer Your Backlog</h1>
       <p>Connect your Steam library. Every day, we pick one game you own and assign a real uncompleted achievement or custom challenge.</p>
       <a href="/auth/steam" class="btn-steam">Sign in with Steam</a>
     </div>
-
     <div id="loading-view" class="card hero-login hidden">
       <h2>Scanning Your Steam Library...</h2>
       <p>Fetching owned games and locked achievements.</p>
     </div>
-
     <div id="error-view" class="card error-msg hidden"></div>
-
     <div id="quest-view" class="card hidden">
       <div class="game-banner">
         <img id="game-img" src="" alt="Game Banner" />
@@ -215,7 +99,6 @@
           <div id="game-meta" class="game-meta">0 hrs played • Picked from 0 games</div>
         </div>
       </div>
-
       <div class="quest-body">
         <div class="challenge-box">
           <img id="ach-icon" src="" alt="Icon" class="hidden" />
@@ -225,7 +108,6 @@
             <div id="challenge-desc" class="challenge-desc">Description goes here.</div>
           </div>
         </div>
-
         <div class="actions">
           <a id="launch-btn" href="#" class="btn-launch">▶ Launch in Steam</a>
           <button id="complete-btn" class="btn-complete">✓ Mark Completed</button>
@@ -234,11 +116,8 @@
       </div>
     </div>
   </main>
-
   <script>
     let rerollCount = 0;
-
-    // Save Steam login from URL redirect into localStorage
     const params = new URLSearchParams(window.location.search);
     if (params.get('steamid')) {
       localStorage.setItem('steam_user', JSON.stringify({
@@ -248,71 +127,62 @@
       }));
       window.history.replaceState({}, document.title, '/');
     }
-
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('steam_user');
       window.location.reload();
     });
-
     async function loadQuest() {
       const loginView = document.getElementById('login-view');
       const loadingView = document.getElementById('loading-view');
       const questView = document.getElementById('quest-view');
       const errorView = document.getElementById('error-view');
-
       const savedUser = JSON.parse(localStorage.getItem('steam_user') || 'null');
       if (!savedUser || !savedUser.id) {
         loadingView.classList.add('hidden');
         loginView.classList.remove('hidden');
         return;
       }
-
       document.getElementById('user-pill').classList.remove('hidden');
       document.getElementById('user-name').textContent = savedUser.name;
       if (savedUser.avatar) document.getElementById('user-avatar').src = savedUser.avatar;
-
       loginView.classList.add('hidden');
       errorView.classList.add('hidden');
       loadingView.classList.remove('hidden');
-
       try {
         const res = await fetch(`/api/daily-quest?steamid=${savedUser.id}&reroll=${rerollCount}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Something went wrong');
-
         document.getElementById('game-img').src = data.game.headerImage;
         document.getElementById('game-title').textContent = data.game.name;
-        document.getElementById('game-meta').textContent =
-          `${data.game.playtimeHours} hrs on record • Selected from ${data.totalGames} games`;
+        document.getElementById('game-meta').textContent = `${data.game.playtimeHours} hrs on record • Selected from ${data.totalGames} games`;
         document.getElementById('launch-btn').href = `steam://run/${data.game.appid}`;
-
         document.getElementById('challenge-type').textContent = data.challenge.type;
         document.getElementById('challenge-title').textContent = data.challenge.title;
         document.getElementById('challenge-desc').textContent = data.challenge.description;
-const iconEl = document.getElementById('ach-icon');
-if (data.challenge.icon) {
-iconEl.src = data.challenge.icon;
-iconEl.classList.remove('hidden');
-} else {
-iconEl.classList.add('hidden');
-}
-const todayKey = quest-done-${new Date().toISOString().slice(0, 10)}-${data.game.appid};
-updateCompleteButton(localStorage.getItem(todayKey) === 'true', todayKey);
-loadingView.classList.add('hidden');
-questView.classList.remove('hidden');
-} catch (err) {
-loadingView.classList.add('hidden');
-errorView.textContent = err.message;
-errorView.classList.remove('hidden');
-}
-}
-function updateCompleteButton(isDone, storageKey) {
-const btn = document.getElementById('complete-btn');
-if (isDone) {
-btn.textContent = '★ Quest Completed!';
-btn.classList.add('done');
-} else {
-btn.textContent = '✓ Mark Completed';
+        const iconEl = document.getElementById('ach-icon');
+        if (data.challenge.icon) {
+          iconEl.src = data.challenge.icon;
+          iconEl.classList.remove('hidden');
+        } else {
+          iconEl.classList.add('hidden');
+        }
+        const todayKey = `quest-done-${new Date().toISOString().slice(0, 10)}-${data.game.appid}`;
+        updateCompleteButton(localStorage.getItem(todayKey) === 'true', todayKey);
+        loadingView.classList.add('hidden');
+        questView.classList.remove('hidden');
+      } catch (err) {
+        loadingView.classList.add('hidden');
+        errorView.textContent = err.message;
+        errorView.classList.remove('hidden');
+      }
+    }
+    function updateCompleteButton(isDone, storageKey) {
+      const btn = document.getElementById('complete-btn');
+      if (isDone) {
+        btn.textContent = '★ Quest Completed!';
+        btn.classList.add('done');
+      } else {
+        btn.textContent = '✓ Mark Completed';
 btn.classList.remove('done');
 }
 btn.onclick = () => {
@@ -326,6 +196,6 @@ rerollCount++;
 loadQuest();
 });
 loadQuest();
-
-
-
+      </script>
+</body>
+</html>
