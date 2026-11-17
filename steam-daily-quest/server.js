@@ -16,25 +16,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 
 passport.use(new SteamStrategy({
-    returnURL: `${BASE_URL}/auth/steam/return`,
-    realm: `${BASE_URL}/`,
+    returnURL: BASE_URL + '/auth/steam/return',
+    realm: BASE_URL + '/',
     apiKey: STEAM_API_KEY,
     stateless: true
   },
-  (identifier, profile, done) => {
+  function(identifier, profile, done) {
     return done(null, profile);
   }
 ));
 
-// Reliable IPv4 HTTPS GET helper for Render -> Steam API
 function fetchSteamJson(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, { family: 4, headers: { 'User-Agent': 'SteamDailyQuest/1.0' } }, (res) => {
+  return new Promise(function(resolve, reject) {
+    https.get(url, { family: 4, headers: { 'User-Agent': 'SteamDailyQuest/1.0' } }, function(res) {
       let raw = '';
-      res.on('data', chunk => { raw += chunk; });
-      res.on('end', () => {
+      res.on('data', function(chunk) { raw += chunk; });
+      res.on('end', function() {
         if (res.statusCode < 200 || res.statusCode >= 300) {
-          return reject(new Error(`HTTP ${res.statusCode}`));
+          return reject(new Error('HTTP ' + res.statusCode));
         }
         try {
           resolve(JSON.parse(raw));
@@ -48,21 +47,21 @@ function fetchSteamJson(url) {
 
 app.get('/auth/steam', passport.authenticate('steam', { session: false }));
 
-app.get('/auth/steam/return', (req, res, next) => {
-  passport.authenticate('steam', { session: false }, (err, user) => {
+app.get('/auth/steam/return', function(req, res, next) {
+  passport.authenticate('steam', { session: false }, function(err, user) {
     if (err || !user) {
       console.error('Steam login error:', err);
       return res.redirect('/?error=login_failed');
     }
     const name = encodeURIComponent(user.displayName || 'Steam Player');
-    const avatar = encodeURIComponent((user.photos && user.photos.at(-1)?.value) || '');
-    return res.redirect(`/?steamid=${user.id}&name=${name}&avatar=${avatar}`);
+    const avatar = encodeURIComponent((user.photos && user.photos.at(-1) && user.photos.at(-1).value) || '');
+    return res.redirect('/?steamid=' + user.id + '&name=' + name + '&avatar=' + avatar);
   })(req, res, next);
 });
 
 function getDailySeed(steamId, offset) {
   const today = new Date().toISOString().slice(0, 10);
-  const str = `${steamId}-${today}-${offset}`;
+  const str = steamId + '-' + today + '-' + offset;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
@@ -79,7 +78,7 @@ const genericChallenges = [
   "Explore an area of the map you haven't visited in a while."
 ];
 
-app.get('/api/daily-quest', async (req, res) => {
+app.get('/api/daily-quest', async function(req, res) {
   const steamId = req.query.steamid;
   if (!steamId) {
     return res.status(401).json({ error: 'Not logged in' });
@@ -88,7 +87,7 @@ app.get('/api/daily-quest', async (req, res) => {
   const rerollOffset = parseInt(req.query.reroll || '0', 10);
 
   try {
-    const gamesUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}&include_appinfo=1&include_played_free_games=1&format=json`;
+    const gamesUrl = 'https://steampowered.com' + encodeURIComponent(STEAM_API_KEY) + '&steamid=' + encodeURIComponent(steamId) + '&include_appinfo=1&include_played_free_games=1&format=json';
     const gamesData = await fetchSteamJson(gamesUrl);
     const games = gamesData.response && gamesData.response.games;
 
@@ -100,7 +99,7 @@ app.get('/api/daily-quest', async (req, res) => {
 
     const seed = getDailySeed(steamId, rerollOffset);
     const chosenGame = games.at(seed % games.length);
-    const headerImage = `https://steamstatic.com{chosenGame.appid}/header.jpg`;
+    const headerImage = 'https://steamstatic.com' + chosenGame.appid + '/header.jpg';
 
     let challenge = {
       type: 'Custom Quest',
@@ -110,8 +109,8 @@ app.get('/api/daily-quest', async (req, res) => {
     };
 
     try {
-      const achUrl = `https://steampowered.com{chosenGame.appid}&key=${encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}`;
-      const schemaUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&appid=${chosenGame.appid}`;
+      const achUrl = 'https://steampowered.com' + chosenGame.appid + '&key=' + encodeURIComponent(STEAM_API_KEY) + '&steamid=' + encodeURIComponent(steamId);
+      const schemaUrl = 'https://steampowered.com' + encodeURIComponent(STEAM_API_KEY) + '&appid=' + chosenGame.appid;
 
       const [achData, schemaData] = await Promise.all([
         fetchSteamJson(achUrl),
@@ -120,11 +119,11 @@ app.get('/api/daily-quest', async (req, res) => {
 
       const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
       const schemaAchs = (schemaData.game && schemaData.game.availableGameStats && schemaData.game.availableGameStats.achievements) || [];
-      const lockedAchs = playerAchs.filter(a => a.achieved === 0);
+      const lockedAchs = playerAchs.filter(function(a) { return a.achieved === 0; });
 
       if (lockedAchs.length > 0 && schemaAchs.length > 0) {
         const targetAch = lockedAchs.at(seed % lockedAchs.length);
-        const details = schemaAchs.find(s => s.name === targetAch.apiname);
+        const details = schemaAchs.find(function(s) { return s.name === targetAch.apiname; });
 
         if (details) {
           challenge = {
@@ -144,15 +143,17 @@ app.get('/api/daily-quest', async (req, res) => {
         appid: chosenGame.appid,
         name: chosenGame.name,
         playtimeHours: Math.round((chosenGame.playtime_forever || 0) / 60),
-        headerImage
+        headerImage: headerImage
       },
-      challenge,
+      challenge: challenge,
       totalGames: games.length
     });
   } catch (err) {
     console.error('Server error:', err);
-    res.status(500).json({ error: `Steam API error: ${err.message}` });
+    res.status(500).json({ error: 'Steam API error: ' + err.message });
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on ${BASE_URL}`));
+app.listen(PORT, function() {
+  console.log('Server running on ' + BASE_URL);
+});
