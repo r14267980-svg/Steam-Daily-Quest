@@ -113,7 +113,14 @@ app.get('/api/daily-quest', async function(req, res) {
     const chosenGame = games.at(seed % games.length);
     const headerImage = STEAM_CDN_HOST + '/store_item_assets/steam/apps/' + chosenGame.appid + '/header.jpg';
 
-    // Build a 26-card roulette strip from the user's real Steam library, landing on chosenGame at index 21
+    const shuffled = games.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = shuffled.at(i);
+      shuffled.splice(i, 1, shuffled.at(j));
+      shuffled.splice(j, 1, temp);
+    }
+
     const reelGames = [];
     for (let i = 0; i < 26; i++) {
       if (i === 21) {
@@ -123,11 +130,11 @@ app.get('/api/daily-quest', async function(req, res) {
           headerImage: headerImage
         });
       } else {
-        const randGame = games.at((seed + i * 11 + 5) % games.length);
+        const pick = shuffled.at(i % shuffled.length);
         reelGames.push({
-          appid: randGame.appid,
-          name: randGame.name,
-          headerImage: STEAM_CDN_HOST + '/store_item_assets/steam/apps/' + randGame.appid + '/header.jpg'
+          appid: pick.appid,
+          name: pick.name,
+          headerImage: STEAM_CDN_HOST + '/store_item_assets/steam/apps/' + pick.appid + '/header.jpg'
         });
       }
     }
