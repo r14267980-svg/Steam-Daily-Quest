@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const session = require('express-session');
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const path = require('path');
@@ -9,27 +8,11 @@ const app = express();
 app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 3000;
-const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+const BASE_URL = (process.env.BASE_URL || `https://steam-daily-quest.onrender.com`).replace(/\/$/, '');
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'super-secret-steam-quest-key',
-  resave: true,
-  saveUninitialized: true,
-  proxy: true,
-  cookie: {
-    secure: 'auto',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  }
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
-
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
+app.use(passport.initialize());
 
 passport.use(new SteamStrategy({
     returnURL: `${BASE_URL}/auth/steam/return`,
@@ -42,35 +25,22 @@ passport.use(new SteamStrategy({
   }
 ));
 
-// Auth Routes with error logging
-app.get('/auth/steam', passport.authenticate('steam'));
+app.get('/auth/steam', passport.authenticate('steam', { session: false }));
 
 app.get('/auth/steam/return', (req, res, next) => {
-  passport.authenticate('steam', (err, user, info) => {
-    if (err) {
-      console.error('Steam Auth Error:', err);
-      return res.redirect('/?auth_error=steam_error');
+  passport.authenticate('steam', { session: false }, (err, user) => {
+    if (err || !user) {
+      console.error('Steam login error:', err);
+      return res.redirect('/?error=login_failed');
     }
-    if (!user) {
-      console.error('Steam Auth Failed:', info);
-      return res.redirect('/?auth_error=no_user');
-    }
-    req.logIn(user, (loginErr) => {
-      if (loginErr) {
-        console.error('Session Login Error:', loginErr);
-        return res.redirect('/?auth_error=session_error');
-      }
-      return res.redirect('/');
-    });
+    const name = encodeURIComponent(user.displayName || 'Steam Player');
+    const avatar = encodeURIComponent((user.photos && user.photos.at(-1)?.value) || '');
+    return res.redirect(`/?steamid=${user.id}&name=${name}&avatar=${avatar}`);
   })(req, res, next);
 });
 
-app.get('/auth/logout', (req, res) => {
-  req.logout(() => res.redirect('/'));
-});
-
-function getDailySeed(steamId, offset = 0) {
-  const today = new Date().toISOString().split('T')[0];
+function getDailySeed(steamId, offset) {
+  const today = new Date().toISOString().slice(0, 10);
   const str = `${steamId}-${today}-${offset}`;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -89,11 +59,11 @@ const genericChallenges = [
 ];
 
 app.get('/api/daily-quest', async (req, res) => {
-  if (!req.isAuthenticated()) {
+  const steamId = req.query.steamid;
+  if (!steamId) {
     return res.status(401).json({ error: 'Not logged in' });
   }
 
-  const steamId = req.user.id;
   const rerollOffset = parseInt(req.query.reroll || '0', 10);
 
   try {
@@ -101,7 +71,7 @@ app.get('/api/daily-quest', async (req, res) => {
     const gamesRes = await fetch(gamesUrl);
     const gamesData = await gamesRes.json();
 
-    const games = gamesData.response?.games;
+    const games = gamesData.response && gamesData.response.games;
     if (!games || games.length === 0) {
       return res.status(400).json({
         error: 'No games found. Make sure your Steam Profile "Game details" are set to Public!'
@@ -109,13 +79,13 @@ app.get('/api/daily-quest', async (req, res) => {
     }
 
     const seed = getDailySeed(steamId, rerollOffset);
-    const chosenGame = games[seed % games.length];
+    const chosenGame = games.at(seed % games.length);
     const headerImage = `https://steamstatic.com{chosenGame.appid}/header.jpg`;
 
     let challenge = {
       type: 'Custom Quest',
       title: 'Explorer’s Trial',
-      description: genericChallenges[seed % genericChallenges.length],
+      description: genericChallenges.at(seed % genericChallenges.length),
       icon: null
     };
 
@@ -126,12 +96,12 @@ app.get('/api/daily-quest', async (req, res) => {
     const achData = await achRes.json();
     const schemaData = await schemaRes.json();
 
-    const playerAchs = achData.playerstats?.achievements || [];
-    const schemaAchs = schemaData.game?.availableGameStats?.achievements || [];
+    const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
+    const schemaAchs = (schemaData.game && schemaData.game.availableGameStats && schemaData.game.availableGameStats.achievements) || [];
     const lockedAchs = playerAchs.filter(a => a.achieved === 0);
 
     if (lockedAchs.length > 0 && schemaAchs.length > 0) {
-      const targetAch = lockedAchs[seed % lockedAchs.length];
+      const targetAch = lockedAchs.at(seed % lockedAchs.length);
       const details = schemaAchs.find(s => s.name === targetAch.apiname);
 
       if (details) {
@@ -145,10 +115,6 @@ app.get('/api/daily-quest', async (req, res) => {
     }
 
     res.json({
-      user: {
-        name: req.user.displayName,
-        avatar: req.user.photos?.[0]?.value || ''
-      },
       game: {
         appid: chosenGame.appid,
         name: chosenGame.name,
@@ -158,7 +124,6 @@ app.get('/api/daily-quest', async (req, res) => {
       challenge,
       totalGames: games.length
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to connect to Steam servers.' });
