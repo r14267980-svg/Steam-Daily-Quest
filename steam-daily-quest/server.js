@@ -113,6 +113,25 @@ app.get('/api/daily-quest', async function(req, res) {
     const chosenGame = games.at(seed % games.length);
     const headerImage = STEAM_CDN_HOST + '/store_item_assets/steam/apps/' + chosenGame.appid + '/header.jpg';
 
+    // Build a 26-card roulette strip from the user's real Steam library, landing on chosenGame at index 21
+    const reelGames = [];
+    for (let i = 0; i < 26; i++) {
+      if (i === 21) {
+        reelGames.push({
+          appid: chosenGame.appid,
+          name: chosenGame.name,
+          headerImage: headerImage
+        });
+      } else {
+        const randGame = games.at((seed + i * 11 + 5) % games.length);
+        reelGames.push({
+          appid: randGame.appid,
+          name: randGame.name,
+          headerImage: STEAM_CDN_HOST + '/store_item_assets/steam/apps/' + randGame.appid + '/header.jpg'
+        });
+      }
+    }
+
     let challenge = {
       type: 'Custom Quest',
       title: 'Explorer’s Trial',
@@ -163,6 +182,7 @@ app.get('/api/daily-quest', async function(req, res) {
         playtimeHours: Math.round((chosenGame.playtime_forever || 0) / 60),
         headerImage: headerImage
       },
+      reelGames: reelGames,
       challenge: challenge,
       totalGames: games.length
     });
