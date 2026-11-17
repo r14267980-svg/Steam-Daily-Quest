@@ -69,19 +69,16 @@
       border: 2px solid var(--steam-blue);
     }
 
-    .user-pill a {
+    .user-pill button {
+      background: none;
       color: #8f98a0;
-      text-decoration: none;
-      margin-left: 8px;
+      padding: 0 0 0 8px;
       font-size: 0.8rem;
     }
 
-    .user-pill a:hover { color: var(--text-bright); }
+    .user-pill button:hover { color: var(--text-bright); }
 
-    main {
-      width: 100%;
-      max-width: 720px;
-    }
+    main { width: 100%; max-width: 720px; }
 
     .card {
       background: var(--bg-card);
@@ -91,23 +88,9 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
-    .hero-login {
-      text-align: center;
-      padding: 60px 30px;
-    }
-
-    .hero-login h1 {
-      color: var(--text-bright);
-      font-size: 2.2rem;
-      margin-bottom: 14px;
-    }
-
-    .hero-login p {
-      max-width: 480px;
-      margin: 0 auto 30px;
-      line-height: 1.6;
-      color: #8f98a0;
-    }
+    .hero-login { text-align: center; padding: 60px 30px; }
+    .hero-login h1 { color: var(--text-bright); font-size: 2.2rem; margin-bottom: 14px; }
+    .hero-login p { max-width: 480px; margin: 0 auto 30px; line-height: 1.6; color: #8f98a0; }
 
     .btn-steam {
       display: inline-flex;
@@ -123,24 +106,10 @@
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .btn-steam:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(6, 191, 255, 0.35);
-    }
+    .btn-steam:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6, 191, 255, 0.35); }
 
-    .game-banner {
-      position: relative;
-      width: 100%;
-      height: 240px;
-      background: #0e141b;
-    }
-
-    .game-banner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .game-banner { position: relative; width: 100%; height: 240px; background: #0e141b; }
+    .game-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .game-overlay {
       position: absolute;
@@ -165,21 +134,9 @@
       letter-spacing: 0.8px;
     }
 
-    .game-title {
-      font-size: 1.9rem;
-      font-weight: 800;
-      color: var(--text-bright);
-    }
-
-    .game-meta {
-      font-size: 0.9rem;
-      color: #8f98a0;
-      margin-top: 4px;
-    }
-
-    .quest-body {
-      padding: 24px;
-    }
+    .game-title { font-size: 1.9rem; font-weight: 800; color: var(--text-bright); }
+    .game-meta { font-size: 0.9rem; color: #8f98a0; margin-top: 4px; }
+    .quest-body { padding: 24px; }
 
     .challenge-box {
       background: rgba(0, 0, 0, 0.25);
@@ -192,40 +149,12 @@
       margin-bottom: 24px;
     }
 
-    .challenge-box img {
-      width: 64px;
-      height: 64px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
+    .challenge-box img { width: 64px; height: 64px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); }
+    .challenge-type { font-size: 0.75rem; text-transform: uppercase; color: var(--steam-blue); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .challenge-title { font-size: 1.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
+    .challenge-desc { font-size: 0.95rem; line-height: 1.5; color: var(--text-main); }
 
-    .challenge-type {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: var(--steam-blue);
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-
-    .challenge-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text-bright);
-      margin-bottom: 6px;
-    }
-
-    .challenge-desc {
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: var(--text-main);
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
     button, .btn-launch {
       cursor: pointer;
@@ -242,40 +171,14 @@
       gap: 8px;
     }
 
-    .btn-launch {
-      background: var(--steam-green);
-      color: white;
-      flex: 1;
-    }
-
+    .btn-launch { background: var(--steam-green); color: white; flex: 1; }
     .btn-launch:hover { background: var(--steam-green-hover); }
-
-    .btn-complete {
-      background: var(--bg-accent);
-      color: var(--text-bright);
-      flex: 1;
-    }
-
-    .btn-complete.done {
-      background: #1e3a2f;
-      color: #4ade80;
-      border: 1px solid #4ade80;
-    }
-
-    .btn-reroll {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
-    }
-
+    .btn-complete { background: var(--bg-accent); color: var(--text-bright); flex: 1; }
+    .btn-complete.done { background: #1e3a2f; color: #4ade80; border: 1px solid #4ade80; }
+    .btn-reroll { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
     .btn-reroll:hover { background: rgba(255, 255, 255, 0.15); }
 
-    .error-msg {
-      padding: 30px;
-      text-align: center;
-      color: #f87171;
-      line-height: 1.6;
-    }
-
+    .error-msg { padding: 30px; text-align: center; color: #f87171; line-height: 1.6; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -285,7 +188,7 @@
     <div id="user-pill" class="user-pill hidden">
       <img id="user-avatar" src="" alt="Avatar" />
       <span id="user-name">Player</span>
-      <a href="/auth/logout">Logout</a>
+      <button id="logout-btn" type="button">Logout</button>
     </div>
   </header>
 
@@ -335,30 +238,47 @@
   <script>
     let rerollCount = 0;
 
+    // Save Steam login from URL redirect into localStorage
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('steamid')) {
+      localStorage.setItem('steam_user', JSON.stringify({
+        id: params.get('steamid'),
+        name: params.get('name') || 'Steam Player',
+        avatar: params.get('avatar') || ''
+      }));
+      window.history.replaceState({}, document.title, '/');
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('steam_user');
+      window.location.reload();
+    });
+
     async function loadQuest() {
       const loginView = document.getElementById('login-view');
       const loadingView = document.getElementById('loading-view');
       const questView = document.getElementById('quest-view');
       const errorView = document.getElementById('error-view');
 
+      const savedUser = JSON.parse(localStorage.getItem('steam_user') || 'null');
+      if (!savedUser || !savedUser.id) {
+        loadingView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('user-pill').classList.remove('hidden');
+      document.getElementById('user-name').textContent = savedUser.name;
+      if (savedUser.avatar) document.getElementById('user-avatar').src = savedUser.avatar;
+
       loginView.classList.add('hidden');
       errorView.classList.add('hidden');
       loadingView.classList.remove('hidden');
 
       try {
-        const res = await fetch(`/api/daily-quest?reroll=${rerollCount}`);
-        if (res.status === 401) {
-          loadingView.classList.add('hidden');
-          loginView.classList.remove('hidden');
-          return;
-        }
-
+        const res = await fetch(`/api/daily-quest?steamid=${savedUser.id}&reroll=${rerollCount}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Something went wrong');
-
-        document.getElementById('user-pill').classList.remove('hidden');
-        document.getElementById('user-name').textContent = data.user.name;
-        document.getElementById('user-avatar').src = data.user.avatar;
 
         document.getElementById('game-img').src = data.game.headerImage;
         document.getElementById('game-title').textContent = data.game.name;
@@ -369,16 +289,14 @@
         document.getElementById('challenge-type').textContent = data.challenge.type;
         document.getElementById('challenge-title').textContent = data.challenge.title;
         document.getElementById('challenge-desc').textContent = data.challenge.description;
-
-        const iconEl = document.getElementById('ach-icon');
-        if (data.challenge.icon) {
-          iconEl.src = data.challenge.icon;
-          iconEl.classList.remove('hidden');
-        } else {
-          iconEl.classList.add('hidden');
-        }
-
-const todayKey = quest-done-${new Date().toISOString().split('T')[0]}-${data.game.appid};
+const iconEl = document.getElementById('ach-icon');
+if (data.challenge.icon) {
+iconEl.src = data.challenge.icon;
+iconEl.classList.remove('hidden');
+} else {
+iconEl.classList.add('hidden');
+}
+const todayKey = quest-done-${new Date().toISOString().slice(0, 10)}-${data.game.appid};
 updateCompleteButton(localStorage.getItem(todayKey) === 'true', todayKey);
 loadingView.classList.add('hidden');
 questView.classList.remove('hidden');
@@ -408,7 +326,6 @@ rerollCount++;
 loadQuest();
 });
 loadQuest();
-    loadQuest();
-  </script>
-</body>
-</html>
+
+
+
