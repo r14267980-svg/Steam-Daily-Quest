@@ -3,6 +3,7 @@ const express = require('express');
 const passport = require('passport');
 const SteamStrategy = require('passport-steam').Strategy;
 const path = require('path');
+const https = require('https');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -24,6 +25,26 @@ passport.use(new SteamStrategy({
     return done(null, profile);
   }
 ));
+
+// Reliable IPv4 HTTPS GET helper for Render -> Steam API
+function fetchSteamJson(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { family: 4, headers: { 'User-Agent': 'SteamDailyQuest/1.0' } }, (res) => {
+      let raw = '';
+      res.on('data', chunk => { raw += chunk; });
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return reject(new Error(`HTTP ${res.statusCode}`));
+        }
+        try {
+          resolve(JSON.parse(raw));
+        } catch (e) {
+          reject(new Error('Invalid JSON from Steam'));
+        }
+      });
+    }).on('error', reject);
+  });
+}
 
 app.get('/auth/steam', passport.authenticate('steam', { session: false }));
 
@@ -68,15 +89,7 @@ app.get('/api/daily-quest', async (req, res) => {
 
   try {
     const gamesUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}&include_appinfo=1&include_played_free_games=1&format=json`;
-    const gamesRes = await fetch(gamesUrl);
-
-    if (!gamesRes.ok) {
-      return res.status(502).json({
-        error: `Steam rejected the API request (Status ${gamesRes.status}). Check that STEAM_API_KEY in Render is valid.`
-      });
-    }
-
-    const gamesData = await gamesRes.json();
+    const gamesData = await fetchSteamJson(gamesUrl);
     const games = gamesData.response && gamesData.response.games;
 
     if (!games || games.length === 0) {
@@ -100,27 +113,26 @@ app.get('/api/daily-quest', async (req, res) => {
       const achUrl = `https://steampowered.com{chosenGame.appid}&key=${encodeURIComponent(STEAM_API_KEY)}&steamid=${steamId}`;
       const schemaUrl = `https://steampowered.com{encodeURIComponent(STEAM_API_KEY)}&appid=${chosenGame.appid}`;
 
-      const [achRes, schemaRes] = await Promise.all([fetch(achUrl), fetch(schemaUrl)]);
-      if (achRes.ok && schemaRes.ok) {
-        const achData = await achRes.json();
-        const schemaData = await schemaRes.json();
+      const [achData, schemaData] = await Promise.all([
+        fetchSteamJson(achUrl),
+        fetchSteamJson(schemaUrl)
+      ]);
 
-        const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
-        const schemaAchs = (schemaData.game && schemaData.game.availableGameStats && schemaData.game.availableGameStats.achievements) || [];
-        const lockedAchs = playerAchs.filter(a => a.achieved === 0);
+      const playerAchs = (achData.playerstats && achData.playerstats.achievements) || [];
+      const schemaAchs = (schemaData.game && schemaData.game.availableGameStats && schemaData.game.availableGameStats.achievements) || [];
+      const lockedAchs = playerAchs.filter(a => a.achieved === 0);
 
-        if (lockedAchs.length > 0 && schemaAchs.length > 0) {
-          const targetAch = lockedAchs.at(seed % lockedAchs.length);
-          const details = schemaAchs.find(s => s.name === targetAch.apiname);
+      if (lockedAchs.length > 0 && schemaAchs.length > 0) {
+        const targetAch = lockedAchs.at(seed % lockedAchs.length);
+        const details = schemaAchs.find(s => s.name === targetAch.apiname);
 
-          if (details) {
-            challenge = {
-              type: 'Steam Achievement',
-              title: details.displayName,
-              description: details.description || 'Hidden Steam Achievement — unlock it in-game to reveal its secret!',
-              icon: details.icon
-            };
-          }
+        if (details) {
+          challenge = {
+            type: 'Steam Achievement',
+            title: details.displayName,
+            description: details.description || 'Hidden Steam Achievement — unlock it in-game to reveal its secret!',
+            icon: details.icon
+          };
         }
       }
     } catch (achErr) {
@@ -139,7 +151,7 @@ app.get('/api/daily-quest', async (req, res) => {
     });
   } catch (err) {
     console.error('Server error:', err);
-    res.status(500).json({ error: `Server error: ${err.message}` });
+    res.status(500).json({ error: `Steam API error: ${err.message}` });
   }
 });
 
